@@ -34,9 +34,9 @@ RUN grep -Ev '^(torch|torchvision|torchaudio)([<>=~!].*)?$' \
 COPY docker/extra_model_paths.yaml \
     /etc/comfyui/extra_model_paths.yaml
 
-COPY docker/post_start.sh \
-    /post_start.sh
+COPY docker/pre_start.sh \
+    /pre_start.sh
 
-RUN chmod 0755 /post_start.sh
+RUN chmod 0755 /pre_start.sh
 
 WORKDIR ${COMFYUI_HOME}
