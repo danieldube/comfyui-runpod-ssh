@@ -76,7 +76,7 @@ PY
     fi
 }
 
-log "ComfyUI post-start hook invoked"
+log "ComfyUI pre-start hook invoked"
 
 prepare_workspace
 start_comfyui
