@@ -1,0 +1,24 @@
+runpod:
+  base_path: /workspace
+  is_default: true
+
+  checkpoints: models/checkpoints/
+  loras: models/loras/
+  vae: models/vae/
+
+  text_encoders: |
+    models/text_encoders/
+    models/clip/
+
+  clip_vision: models/clip_vision/
+
+  controlnet: |
+    models/controlnet/
+    models/t2i_adapter/
+
+  diffusion_models: |
+    models/diffusion_models/
+    models/unet/
+
+  embeddings: models/embeddings/
+  upscale_models: models/upscale_models/

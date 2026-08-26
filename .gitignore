@@ -1,0 +1,45 @@
+# Local ComfyUI workspace and generated data
+/workspace/
+/models/
+/input/
+/output/
+/user/
+
+# Downloaded model files
+*.safetensors
+*.ckpt
+*.gguf
+*.bin
+*.pt
+*.pth
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+
+# Python caches, virtual environments, and test output
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+.venv/
+venv/
+env/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.iml
+
+# Operating-system files
+.DS_Store
+Thumbs.db
