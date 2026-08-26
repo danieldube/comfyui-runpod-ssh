@@ -1,4 +1,4 @@
-FROM runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404
+FROM runpod/pytorch:1.0.3-cu1300-torch291-ubuntu2404
 
 ARG COMFYUI_VERSION=v0.32.0
 
