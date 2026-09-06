@@ -47,7 +47,7 @@ ComfyUI
 * pinned ComfyUI version
 * OpenSSH server
 * private ComfyUI interface
-* persistent models and generated files under `/workspace`
+* persistent ComfyUI data under `/workspace/comfyui`
 * automatic container builds with GitHub Actions
 * container images published to GitHub Container Registry
 
@@ -58,8 +58,10 @@ ComfyUI
 ├── .github/
 │   └── workflows/
 │       └── container.yml
+├── docs/
+│   └── storage-layout.md
 ├── docker/
-│   ├── entrypoint.sh
+│   ├── pre_start.sh
 │   └── extra_model_paths.yaml
 ├── .dockerignore
 ├── Dockerfile
@@ -70,28 +72,36 @@ ComfyUI
 
 The Docker image contains software and dependencies only.
 
-Large and mutable data is stored separately under `/workspace`:
+Large and mutable data is stored separately under `/workspace/comfyui`:
 
 ```text
 /workspace/
-├── models/
-│   ├── checkpoints/
-│   ├── loras/
-│   ├── vae/
-│   ├── controlnet/
-│   ├── text_encoders/
-│   ├── clip_vision/
-│   ├── diffusion_models/
-│   ├── embeddings/
-│   └── upscale_models/
-├── input/
-├── output/
-└── user/
+└── comfyui/
+    ├── models/
+    │   ├── checkpoints/
+    │   ├── loras/
+    │   ├── vae/
+    │   ├── controlnet/
+    │   ├── text_encoders/
+    │   ├── clip_vision/
+    │   ├── diffusion_models/
+    │   ├── embeddings/
+    │   └── upscale_models/
+    ├── input/
+    ├── output/
+    ├── runtime/
+    │   ├── comfyui.log
+    │   └── comfyui.pid
+    └── user/
+        └── comfyui.db
 ```
 
 On RunPod, `/workspace` should be backed by persistent storage.
 
 Models are deliberately not included in the Docker image.
+
+The [storage-layout decision](docs/storage-layout.md) explains why shared data
+and ComfyUI user state are separated and how to move an existing volume.
 
 ## Build locally
 
@@ -241,25 +251,25 @@ GPU: NVIDIA ...
 Put checkpoints in:
 
 ```text
-/workspace/models/checkpoints/
+/workspace/comfyui/models/checkpoints/
 ```
 
 For example:
 
 ```text
-/workspace/models/checkpoints/RealVisXL_V5.0_fp16.safetensors
+/workspace/comfyui/models/checkpoints/RealVisXL_V5.0_fp16.safetensors
 ```
 
 LoRAs go into:
 
 ```text
-/workspace/models/loras/
+/workspace/comfyui/models/loras/
 ```
 
 ControlNet models go into:
 
 ```text
-/workspace/models/controlnet/
+/workspace/comfyui/models/controlnet/
 ```
 
 The supplied `extra_model_paths.yaml` makes these persistent directories available to ComfyUI.
@@ -354,7 +364,8 @@ Command override:
 none
 ```
 
-The Docker image's own entrypoint starts both SSH and ComfyUI.
+RunPod's inherited startup script starts SSH and invokes this image's
+`/pre_start.sh`, which starts ComfyUI.
 
 ### SSH key
 
@@ -445,8 +456,9 @@ Change the Docker configuration and commit it:
 ```bash
 git add -- \
     Dockerfile \
-    docker/entrypoint.sh \
-    docker/extra_model_paths.yaml
+    docker/pre_start.sh \
+    docker/extra_model_paths.yaml \
+    docs/storage-layout.md
 
 git commit -m "Update ComfyUI runtime"
 git push

@@ -3,7 +3,9 @@
 set -u
 
 COMFYUI_HOME="${COMFYUI_HOME:-/opt/ComfyUI}"
-WORKSPACE="${WORKSPACE:-/workspace}"
+COMFYUI_WORKSPACE="${COMFYUI_WORKSPACE:-/workspace/comfyui}"
+COMFYUI_USER_DIR="${COMFYUI_WORKSPACE}/user"
+COMFYUI_RUNTIME_DIR="${COMFYUI_WORKSPACE}/runtime"
 COMFYUI_PORT="${COMFYUI_PORT:-8188}"
 
 log()
@@ -11,29 +13,29 @@ log()
     printf '[comfyui-start] %s\n' "$*"
 }
 
-prepare_workspace()
+prepare_comfyui_workspace()
 {
-    log "Preparing persistent workspace"
+    log "Preparing ComfyUI workspace at ${COMFYUI_WORKSPACE}"
 
     mkdir -p \
-        "${WORKSPACE}/models/checkpoints" \
-        "${WORKSPACE}/models/loras" \
-        "${WORKSPACE}/models/vae" \
-        "${WORKSPACE}/models/controlnet" \
-        "${WORKSPACE}/models/t2i_adapter" \
-        "${WORKSPACE}/models/text_encoders" \
-        "${WORKSPACE}/models/clip" \
-        "${WORKSPACE}/models/clip_vision" \
-        "${WORKSPACE}/models/diffusion_models" \
-        "${WORKSPACE}/models/unet" \
-        "${WORKSPACE}/models/upscale_models" \
-        "${WORKSPACE}/models/embeddings" \
-        "${WORKSPACE}/input" \
-        "${WORKSPACE}/output" \
-        "${WORKSPACE}/user" \
-        "${WORKSPACE}/workflows"
+        "${COMFYUI_WORKSPACE}/models/checkpoints" \
+        "${COMFYUI_WORKSPACE}/models/loras" \
+        "${COMFYUI_WORKSPACE}/models/vae" \
+        "${COMFYUI_WORKSPACE}/models/controlnet" \
+        "${COMFYUI_WORKSPACE}/models/t2i_adapter" \
+        "${COMFYUI_WORKSPACE}/models/text_encoders" \
+        "${COMFYUI_WORKSPACE}/models/clip" \
+        "${COMFYUI_WORKSPACE}/models/clip_vision" \
+        "${COMFYUI_WORKSPACE}/models/diffusion_models" \
+        "${COMFYUI_WORKSPACE}/models/unet" \
+        "${COMFYUI_WORKSPACE}/models/upscale_models" \
+        "${COMFYUI_WORKSPACE}/models/embeddings" \
+        "${COMFYUI_WORKSPACE}/input" \
+        "${COMFYUI_WORKSPACE}/output" \
+        "${COMFYUI_USER_DIR}" \
+        "${COMFYUI_RUNTIME_DIR}"
 
-    log "Workspace ready"
+    log "ComfyUI workspace ready"
 }
 
 print_runtime_info()
@@ -58,9 +60,9 @@ PY
 
 start_comfyui()
 {
-    local log_file="${WORKSPACE}/comfyui.log"
-    local pid_file="${WORKSPACE}/comfyui.pid"
-    local database_file="${WORKSPACE}/user/comfyui.db"
+    local log_file="${COMFYUI_RUNTIME_DIR}/comfyui.log"
+    local pid_file="${COMFYUI_RUNTIME_DIR}/comfyui.pid"
+    local database_file="${COMFYUI_USER_DIR}/comfyui.db"
 
     if [[ -f "${pid_file}" ]]; then
         local existing_pid
@@ -89,9 +91,9 @@ start_comfyui()
         --listen 127.0.0.1 \
         --port "${COMFYUI_PORT}" \
         --extra-model-paths-config /etc/comfyui/extra_model_paths.yaml \
-        --input-directory "${WORKSPACE}/input" \
-        --output-directory "${WORKSPACE}/output" \
-        --user-directory "${WORKSPACE}/user" \
+        --input-directory "${COMFYUI_WORKSPACE}/input" \
+        --output-directory "${COMFYUI_WORKSPACE}/output" \
+        --user-directory "${COMFYUI_USER_DIR}" \
         --database-url "sqlite:///${database_file}" \
         --disable-auto-launch \
         > "${log_file}" 2>&1 &
@@ -121,8 +123,8 @@ main()
 {
     log "ComfyUI pre-start hook invoked"
 
-    if ! prepare_workspace; then
-        log "ERROR: Failed to prepare workspace"
+    if ! prepare_comfyui_workspace; then
+        log "ERROR: Failed to prepare ComfyUI workspace"
         return 0
     fi
 

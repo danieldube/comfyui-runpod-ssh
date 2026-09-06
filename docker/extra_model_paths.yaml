@@ -1,5 +1,5 @@
 runpod:
-  base_path: /workspace
+  base_path: /workspace/comfyui
   is_default: true
 
   checkpoints: models/checkpoints/

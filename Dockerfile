@@ -4,7 +4,8 @@ ARG COMFYUI_VERSION=v0.32.0
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    COMFYUI_HOME=/opt/ComfyUI
+    COMFYUI_HOME=/opt/ComfyUI \
+    COMFYUI_WORKSPACE=/workspace/comfyui
 
 # ---------------------------------------------------------------------------
 # System dependencies
@@ -85,7 +86,7 @@ RUN cd "${COMFYUI_HOME}" \
 # ComfyUI configuration
 #
 # Models and mutable data are deliberately kept outside the image in
-# /workspace, which should be backed by persistent RunPod storage.
+# /workspace/comfyui, which should be backed by persistent RunPod storage.
 # ---------------------------------------------------------------------------
 
 COPY docker/extra_model_paths.yaml \
